@@ -1,0 +1,49 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# GLOBAL aliases
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+alias l='ls -lAh'
+alias lsd="lsd -lha  --group-directories-first"
+
+alias lzd="lazydocker"
+
+# docker
+alias do='docker'
+alias dps='docker ps'
+alias di='docker inspect'
+alias dm='docker images'
+alias dcp='docker container port'
+alias dl='docker logs'
+alias dlf='docker logs -f'
+alias dv='docker version'
+alias dn='docker info'
+alias dsp='docker system prune'
+alias dspa='docker system prune -a'
+
+# docker compose
+alias dcc="docker compose"
+alias dccd="dcc down"
+alias dccu="dcc up"
+alias dccud="dccu -d"
+alias dccudb="dccud --build"
+alias dccreup="dccd && dccudb"
+
+# dir
+alias md='mkdir'
+alias rd='rmdir'
+
+# composer
+alias cm='composer'
+alias cmu='composer update -W'
+alias cmund='composer update -W --no-dev'
+alias ci='composer install'
+alias cs='composer show'
+
+# git
+alias gs='git status'
+alias gc='git commit -v'
+alias gba='git branch -a'
+alias gcu='git checkout -t'
+alias gpr='git pull --rebase'
+alias gst='git stash'
+alias gstp='git stash pop'

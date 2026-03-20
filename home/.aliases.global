@@ -1,0 +1,51 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# GLOBAL aliases
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# basic aliases
+alias ls='ls $LS_OPTIONS'
+alias ll='ls $LS_OPTIONS -l'
+alias l='ls $LS_OPTIONS -lA'
+
+alias md='mkdir'
+alias rd='rmdir'
+
+# composer
+alias cm='composer'
+alias cu='composer update'
+alias ci='composer install'
+
+# docker
+alias do='docker'
+alias dps='docker ps'
+alias di='docker inspect'
+alias dm='docker images'
+alias dcp='docker container port'
+alias dl='docker logs'
+alias dlf='docker logs -f'
+alias dv='docker version'
+alias dn='docker info'
+alias dsp='docker system prune'
+alias dspa='docker system prune -a'
+
+# docker compose
+alias dc='docker-compose'
+alias dcd='dc down'
+alias dcu='dc up'
+alias dcud='dcu -d'
+alias dcub='dcud --build'
+alias dcdu='dcd && dcu'
+
+# git
+alias gs='git status'
+alias gc='git commit -v'
+alias gba='git branch -a'
+alias gcu='git checkout -t'
+alias gpr='git pull --rebase'
+alias gst='git stash'
+alias gstp='git stash pop'
+
+# go
+alias gob='go build -ldflags="-s -w"'
+
+

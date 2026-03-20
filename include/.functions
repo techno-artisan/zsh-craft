@@ -1,0 +1,218 @@
+# FUNCTIONS
+
+function getBashVersion {
+  BASH_VERSION=$(bash --version | grep -i "gnu bash" | awk '{print $4}' | sed 's/[^0-9\.]*//g')
+  export BASH_VERSION
+}
+
+versionCompare() {
+    if [[ "$1" == "$2" ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    # shellcheck disable=SC2206
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
+#
+function ensureValidBashVersion {
+  getBashVersion
+  versionCompare "${BASH_VERSION}" "${MIN_BASH_VERSION}"
+
+  if [[ $? != 1 ]]; then
+    printc "ERROR: " "rd" "b"
+    printcLn "wrong bash version: ${BASH_VERSION} (expected min: ${MIN_BASH_VERSION})" "lre"
+    exit 1
+  fi
+}
+
+# detect current OS
+function detectOS {
+  UNAME_OUT="$(uname -s)"
+  case "${UNAME_OUT}" in
+      Linux*)   OS_TYPE=linux;;    # default: linux
+      Darwin*)  OS_TYPE=osx;;      # MacOS / OSX
+      CYGWIN*)  OS_TYPE=cygwin;;   # Linux/POSIX for Windows
+      MINGW*)   OS_TYPE=mingw;;    # Minimal GNU Tools for Windows
+      *)        OS_TYPE="UNKNOWN:${UNAME_OUT}"
+                echo "ERROR (detectOS): ${OS_TYPE}"
+                exit 1
+  esac
+
+  export OS_TYPE
+}
+
+# detect the Raspberry Pi Hardware Revision (empty if not Pi)
+function getHardwareRevision {
+    # shellcheck disable=SC2002
+    HW_REV=""
+    if [ -f "/proc/cpuinfo" ] ; then
+      HW_REV=$(cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}')
+    fi
+    export HW_REV
+}
+
+# detect whether current system is a Raspberry Pi or not
+function isPi {
+    getHardwareRevision
+
+    if [ -z "$HW_REV" ]; then
+        IS_PI=false
+    else
+        IS_PI=true
+    fi
+
+    export IS_PI
+}
+
+# get the Raspberry Pi Model
+function getPiModel {
+    PI_MODEL=$(tr -d '\0' </proc/device-tree/model)
+    export PI_MODEL
+}
+
+########
+# param #1 (mandatory) [string]: text to be colorized
+# param #2 (mandatory) [string]: color
+# param #3 (optional)  [string]: style
+# param #4 (optional)  [bool]  : underline            {default: false}
+function colorize() {
+
+  local TEXT=$1
+
+  # text color
+  case "$2" in
+            ""       | "default")  COLOR="${FG_DEFAULT}"  ;;
+    "rd" | "red"     | "RED")      COLOR="${FG_RED}"      ;;
+    "gr" | "green"   | "GREEN")    COLOR="${FG_GREEN}"    ;;
+    "ye" | "yellow"  |"YELLOW")    COLOR="${FG_YELLOW}"   ;;
+    "yl" | "blue"    | "BLUE")     COLOR="${FG_BLUE}"     ;;
+    "ma" | "magenta" | "MAGENTA")  COLOR="${FG_MAGENTA}"  ;;
+    "cy" | "cyan"    | "CYAN")     COLOR="${FG_CYAN}"     ;;
+    "wh" | "white"   | "WHITE")    COLOR="${FG_WHITE}"    ;;
+    "bl" | "black"   | "BLACK")    COLOR="${FG_BLACK}"    ;;
+
+    "lgy" | "l_gray"    | "light_gray"    | "LIGHT_GRAY")     COLOR="${FG_LIGHT_GRAY}"    ;;
+    "dgy" | "d_gray"    | "dark_gray"     | "DARK_GRAY")      COLOR="${FG_DARK_GRAY}"     ;;
+    "lre" | "l_red"     | "light_red"     | "LIGHT_RED")      COLOR="${FG_LIGHT_RED}"     ;;
+    "lgr" | "l_green"   | "light_green"   | "LIGHT_GREEN")    COLOR="${FG_LIGHT_GREEN}"   ;;
+    "lyl" | "l_yellow"  | "light_yellow"  | "LIGHT_YELLOW")   COLOR="${FG_LIGHT_YELLOW}"  ;;
+    "lbl" | "l_blue"    | "light_blue"    | "LIGHT_BLUE")     COLOR="${FG_LIGHT_BLUE}"    ;;
+    "lma" | "l_magenta" | "light_magenta" | "LIGHT_MAGENTA")  COLOR="${FG_LIGHT_MAGENTA}" ;;
+    "lcy" | "l_cyan"    | "light_cyan"    | "LIGHT_CYAN")     COLOR="${FG_LIGHT_CYAN}"    ;;
+  esac
+
+  # text type
+  case "$3" in
+    "" )                     TYPE=""                ;;
+    "b"     | "bold")        TYPE=${FONT_BOLD}      ;;
+    "d"     | "dim")         TYPE=${FONT_DIM}       ;;
+    "u"     | "underline")   TYPE=${FONT_UNDERLINE} ;;
+    "k"     | "blink")       TYPE=${FONT_BLINK}     ;;
+    "i"     | "inverted")    TYPE=${FONT_INVERTED}  ;;
+    "h"     | "hidden")      TYPE=${FONT_HIDDEN}    ;;
+  esac
+
+  # assemble text with style and color
+  COLORIZED_TEXT=$(printf "%s%s%s%s\n" "${COLOR}" "${TYPE}" "${TEXT}" "${RESET_ALL}")
+
+  # enable underline the whole string (TEXT)
+  if [ "$4" == true ]; then
+    underline "${TEXT}"
+  fi
+
+  export COLORIZED_TEXT
+  export UNDERLINE
+}
+
+
+########
+function printc() {
+    colorize "$1" "$2" "$3" "$4"
+    echo -ne "${COLORIZED_TEXT}"
+}
+
+########
+function printcLn() {
+  printc "$1" "$2" "$3" "$4"
+  echo
+}
+
+#
+# check the result of an operation
+# param #1 (int)   : result               {mandatory}
+# param #2 (string): text for successful  {optional}
+# param #3 (string): text for error/fail  {optional}
+function checkResult() {
+  local OK="successful"
+  if [ -n "$2" ]
+  then
+    local OK="$2"
+  fi
+
+  local FAIL="FAILED"
+  if [ -n "$3" ]
+  then
+    FAIL="$3"
+  fi
+
+  if [ "$1" -eq 0 ]; then
+    printcLn "${OK}" "green"
+  else
+    printcLn "${FAIL}" "red"
+  fi
+}
+
+# same as above, just with newline
+function checkResultLn() {
+  checkResult "$1" "$2" "$3"
+  echo
+}
+
+# detect package manager
+function detectPackageManager() {
+  if [ "$(command -v apk)" ] ; then
+    PKMGR="apk"
+  elif [ "$(command -v yum)" ] ; then
+    PKMGR="yum"
+  elif [ "$(command -v apt)" ] ; then
+    PKMGR="apt"
+  elif [ "$(command -v pacman)" ] ; then
+    PKMGR="pacman"
+  else
+    PKMGR=false
+  fi
+
+  export PKMGR
+}
+
+function implode() {
+  local d=$1;
+  shift;
+  local f=$1;
+  shift;
+  printf %s "$f" "${@/#/$d}";
+}

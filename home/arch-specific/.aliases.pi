@@ -1,0 +1,10 @@
+# ----------------------------------------------------------
+# PI specific
+
+# temperature
+alias temp="vcgencmd measure_temp | sed '/temp=//'w"
+alias tempw='watch -n1 "vcgencmd measure_temp"'
+
+# network
+alias showlisten='netstat -ntple'
+alias showlisten2='lsof -OnP | grep LISTEN'

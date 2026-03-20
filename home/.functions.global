@@ -1,0 +1,19 @@
+
+# recursive du (disk usage), sorted desc by size, limited to NUM entries
+function rdu() {
+  local PATHS=();
+  local NUM=50;
+
+  while [ -n "$1" ]; do
+    if [ -e "$1" ]; then
+      PATHS=("${PATHS[@]}" "$1");
+    elif [ -z "${1//[0-9]/}" ]; then
+      NUM=$1;
+    else
+      echo "Unknown argument '$1'";
+    fi;
+    shift;
+  done;
+
+  du -xm "${PATHS[@]}" | sort -rn | head -n $NUM | sort -k2;
+}
