@@ -79,9 +79,24 @@ printcLn "copying pre-configured config files..." "wh"
 printc "...'.zshrc'..." "lyl"
 cp ./home/.zshrc ~/.zshrc
 checkResult "$?"
-printc "...'.p10k.zsh'..." "lyl"
-cp ./home/.p10k.zsh ~/.p10k.zsh
-checkResultLn "$?"
+echo
+printcLn "Powerlevel10k theme configuration:" "wh"
+printcLn "  [1] Use pre-configured theme (recommended)" "lgr"
+printcLn "  [2] Configure it yourself on first zsh start" "lyl"
+echo
+P10K_CHOICE=""
+while [[ "$P10K_CHOICE" != "1" && "$P10K_CHOICE" != "2" ]]; do
+    printc "Your choice [1]: " "lcy"
+    read -r P10K_CHOICE
+    P10K_CHOICE="${P10K_CHOICE:-1}"
+done
+if [[ "$P10K_CHOICE" == "1" ]]; then
+    printc "copying pre-configured '.p10k.zsh'..." "lyl"
+    cp ./home/.p10k.zsh ~/.p10k.zsh
+    checkResultLn "$?"
+else
+    printcLn "skipping '.p10k.zsh' — Powerlevel10k will guide you through configuration on first start." "lyl"
+fi
 ADDITIONAL_PLUGINS=()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

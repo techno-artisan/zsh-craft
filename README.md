@@ -51,7 +51,7 @@ The installer is non-interactive and runs fully automated:
 - Clones **zsh-autosuggestions** and **zsh-syntax-highlighting** into `~/.oh-my-zsh/custom/plugins/`
 - Copies pre-configured dotfiles to `$HOME`:
   - `.zshrc` — main ZSH config with plugins and theme already set up
-  - `.p10k.zsh` — Powerlevel10k theme config
+  - `.p10k.zsh` — Powerlevel10k theme config *(the installer asks whether to use the pre-configured theme or configure interactively on first start)*
   - `.colors` — ANSI color variables
   - `.functions` — utility functions (installer base + global additions combined)
   - `.aliases` — alias set assembled from global + OS/package-manager-specific files
@@ -59,6 +59,21 @@ The installer is non-interactive and runs fully automated:
 - Detects Raspberry Pi — appends Pi-specific aliases if running on one
 - On macOS: adds the `osx` plugin to `.zshrc` automatically
 - Launches `zsh` via `exec zsh -l` — no manual steps needed
+
+#### Powerlevel10k theme configuration
+
+During installation, you are asked how you want to configure the Powerlevel10k theme:
+
+| Option | What happens |
+|--------|-------------|
+| **[1] Use pre-configured theme** (default) | Copies the author's `.p10k.zsh` to `~` — shell is ready immediately with no extra steps |
+| **[2] Configure it yourself** | Skips copying `.p10k.zsh` — Powerlevel10k automatically launches its interactive configuration wizard the first time `zsh` starts |
+
+You can re-run the wizard at any time with:
+
+```bash
+p10k configure
+```
 
 ### Supported platforms ###
 
