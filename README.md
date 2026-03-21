@@ -6,7 +6,7 @@
 
 A shell setup installer that bootstraps a new Linux/macOS/Windows (Cygwin/MinGW) server or workstation with a fully configured ZSH environment.
 
-![zshcraft in action](assets/techno-artisan__zsh-craft.png)
+![zshcraft in action](assets/techno-artisan__zsh-craft__installer.png)
 
 ### Background ###
 
@@ -74,6 +74,8 @@ The installer is non-interactive and runs fully automated:
 * Keep alias/function files platform-scoped
 
 ### Uninstall ###
+
+![zshcraft uninstaller in action](assets/techno-artisan__zsh-craft__uninstaller.png)
 
 Run the interactive uninstaller:
 
