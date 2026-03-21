@@ -2,9 +2,8 @@
 # shellcheck disable=SC1090
 
 # the installer version
-ZSHCRAFT_VERSION="1.0.0"
-
 # load essential include files
+source ./include/.version
 source ./include/.colors
 source ./include/.functions
 
