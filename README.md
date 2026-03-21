@@ -3,6 +3,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Shell: Bash](https://img.shields.io/badge/Shell-Bash-4EAA25?logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![ZSH](https://img.shields.io/badge/ZSH-Oh%20My%20ZSH-1A2C34?logo=zsh&logoColor=white)](https://ohmyz.sh/)
+[![GitHub Stars](https://img.shields.io/github/stars/techno-artisan/zsh-craft?style=social)](https://github.com/techno-artisan/zsh-craft/stargazers)
+[![GitHub Downloads](https://img.shields.io/github/downloads/techno-artisan/zsh-craft/total?label=Downloads&color=blue)](https://github.com/techno-artisan/zsh-craft/releases)
 
 A shell setup installer that bootstraps a new Linux/macOS/Windows (Cygwin/MinGW) server or workstation with a fully configured ZSH environment.
 
