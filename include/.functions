@@ -250,51 +250,57 @@ function copy_config_file() {
 
 # Install a package using the appropriate package manager
 # Usage: install_package <package_name> <description>
+# Supports multiple space-separated packages
 function install_package() {
-  local package="$1"
+  local packages="$1"
   local description="$2"
 
-  # Map package names based on package manager
-  local mapped_package
-  case "$PKMGR" in
-    apk)
-      # APK uses similar names to APT
-      mapped_package="$package"
-      ;;
-    yum)
-      # YUM: ruby-full -> ruby
-      mapped_package="${package//ruby-full/ruby}"
-      ;;
-    apt)
-      # APT: keep as is
-      mapped_package="$package"
-      ;;
-    pacman)
-      # Pacman: ruby-full -> ruby
-      mapped_package="${package//ruby-full/ruby}"
-      ;;
-    *)
-      printcLn "ERROR: Unsupported package manager: $PKMGR" "lre"
-      exit 1
-      ;;
-  esac
-
   printc "installing ${description}..." "lyl"
-  case "$PKMGR" in
-    apk)
-      $SUDO_CMD apk add "$mapped_package"
-      ;;
-    yum)
-      $SUDO_CMD yum install -y "$mapped_package"
-      ;;
-    apt)
-      $SUDO_CMD apt install -y "$mapped_package"
-      ;;
-    pacman)
-      $SUDO_CMD pacman -S --noconfirm "$mapped_package"
-      ;;
-  esac
-  checkResultLn "$?" || { printcLn "FAILED: package installation failed (check permissions or package manager)" "lre"; exit 1; }
+
+  # Split packages by space and install each one
+  for pkg in $packages; do
+    # Map package names based on package manager
+    local mapped_package="$pkg"
+    case "$PKMGR" in
+      apk)
+        # APK uses similar names to APT
+        mapped_package="$pkg"
+        ;;
+      yum)
+        # YUM: ruby-full -> ruby
+        mapped_package="${pkg//ruby-full/ruby}"
+        ;;
+      apt)
+        # APT: keep as is
+        mapped_package="$pkg"
+        ;;
+      pacman)
+        # Pacman: ruby-full -> ruby
+        mapped_package="${pkg//ruby-full/ruby}"
+        ;;
+      *)
+        printcLn "ERROR: Unsupported package manager: $PKMGR" "lre"
+        exit 1
+        ;;
+    esac
+
+    case "$PKMGR" in
+      apk)
+        $SUDO_CMD apk add "$mapped_package"
+        ;;
+      yum)
+        $SUDO_CMD yum install -y "$mapped_package"
+        ;;
+      apt)
+        $SUDO_CMD apt update >/dev/null 2>&1
+        $SUDO_CMD apt install -y "$mapped_package"
+        ;;
+      pacman)
+        $SUDO_CMD pacman -S --noconfirm "$mapped_package"
+        ;;
+    esac
+    checkResultLn "$?" || { printcLn "FAILED: package installation failed for '$mapped_package' (check permissions or package manager)" "lre"; exit 1; }
+  done
 }
 
 # Install a gem package
