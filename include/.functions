@@ -224,6 +224,12 @@ function install_git_repo() {
   local target_path="$2"
   local app_name="$3"
 
+  # Expand the target path to handle ~
+  target_path="${target_path/\~/$HOME}"
+
+  # Create parent directories if they don't exist
+  mkdir -p "$(dirname "$target_path")"
+
   printcLn "installing '${app_name}'..." "wh"
   git clone "$repo_url" "$target_path"
   local result=$?
@@ -333,8 +339,12 @@ function install_gem() {
 # Priority: global -> arch -> package-manager -> user
 function loadAliases() {
   local ALIASES_DIR="./home/aliases"
+  local ALIASES_FILE="${HOME}/.aliases"
   local loaded_aliases=()
   local conflicts=()
+
+  # Initialize the aliases file
+  : > "$ALIASES_FILE"
 
   # Function to load aliases from a directory
   load_from_dir() {
@@ -346,7 +356,7 @@ function loadAliases() {
         if [[ -f "$file" ]]; then
           printc "loading ${category} aliases from $(basename "$file")..." "lbl"
 
-          # Read aliases from file and check for conflicts
+          # Read aliases from file, check for conflicts, and write to aliases file
           while IFS= read -r line; do
             # Skip comments and empty lines
             [[ "$line" =~ ^[[:space:]]*# ]] && continue
@@ -361,12 +371,12 @@ function loadAliases() {
                 conflicts+=("$alias_name from $(basename "$file") (conflicts with existing)")
               else
                 loaded_aliases+=("$alias_name")
+                # Write the alias to the aliases file
+                echo "$line" >> "$ALIASES_FILE"
               fi
             fi
           done < "$file"
 
-          # Source the file to actually load the aliases
-          source "$file"
           checkResult "$?"
         fi
       done
@@ -387,7 +397,21 @@ function loadAliases() {
         # Load pi.sh specifically if it exists
         if [[ -f "$ALIASES_DIR/arch/pi.sh" ]]; then
           printc "loading pi-specific aliases..." "lbl"
-          source "$ALIASES_DIR/arch/pi.sh"
+
+          while IFS= read -r line; do
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "$line" ]] && continue
+            if [[ "$line" =~ ^alias[[:space:]]+([^=]+)= ]]; then
+              local alias_name="${BASH_REMATCH[1]}"
+              if [[ " ${loaded_aliases[*]} " =~ " ${alias_name} " ]]; then
+                conflicts+=("$alias_name from pi.sh (conflicts with existing)")
+              else
+                loaded_aliases+=("$alias_name")
+                echo "$line" >> "$ALIASES_FILE"
+              fi
+            fi
+          done < "$ALIASES_DIR/arch/pi.sh"
+
           checkResult "$?"
         fi
       fi

@@ -102,15 +102,18 @@ RESULT=$?
 printc "\ninstallation of Oh My ZSH! completed..." "wh"
 checkResultLn "${RESULT}" || { printcLn "FAILED: Oh My ZSH!" "lre"; exit 1; }
 
+# Set ZSH_CUSTOM if not already set
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # install Powerlevel10k
 # github: https://github.com/romkatv/powerlevel10k
-install_git_repo "https://github.com/romkatv/powerlevel10k.git" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k" "Powerlevel10k"
+install_git_repo "https://github.com/romkatv/powerlevel10k.git" "$ZSH_CUSTOM/themes/powerlevel10k" "Powerlevel10k"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # install smart plugins for omz
-install_git_repo "https://github.com/zsh-users/zsh-autosuggestions" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" "autosuggestions"
-install_git_repo "https://github.com/zsh-users/zsh-syntax-highlighting.git" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" "syntax-highlighting"
+install_git_repo "https://github.com/zsh-users/zsh-autosuggestions" "$ZSH_CUSTOM/plugins/zsh-autosuggestions" "autosuggestions"
+install_git_repo "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" "syntax-highlighting"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # copy pre-configured oh-my-zsh + Powerlevel10k config file
