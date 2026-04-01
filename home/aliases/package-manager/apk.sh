@@ -1,12 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# package manager specific
-# apk
+# APK package manager aliases
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# apk
 alias aps='apk search'
 alias apu='apk update'
 alias apug='apk upgrade'
 alias apudug='apu && apug'
 alias apa='apk add'
 alias apd='apk del'
-

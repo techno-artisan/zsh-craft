@@ -269,3 +269,92 @@ function install_gem() {
   $SUDO_CMD gem install "$gem"
   checkResultLn "$?" || { printcLn "FAILED: gem install $gem" "lre"; exit 1; }
 }
+
+# Load aliases hierarchically with conflict detection
+# Priority: global -> arch -> package-manager -> user
+function loadAliases() {
+  local ALIASES_DIR="./home/aliases"
+  local loaded_aliases=()
+  local conflicts=()
+
+  # Function to load aliases from a directory
+  load_from_dir() {
+    local dir="$1"
+    local category="$2"
+
+    if [[ -d "$dir" ]]; then
+      for file in "$dir"/*.sh; do
+        if [[ -f "$file" ]]; then
+          printc "loading ${category} aliases from $(basename "$file")..." "lbl"
+
+          # Read aliases from file and check for conflicts
+          while IFS= read -r line; do
+            # Skip comments and empty lines
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "$line" ]] && continue
+
+            # Extract alias name (format: alias name='value')
+            if [[ "$line" =~ ^alias[[:space:]]+([^=]+)= ]]; then
+              local alias_name="${BASH_REMATCH[1]}"
+
+              # Check for conflicts
+              if [[ " ${loaded_aliases[*]} " =~ " ${alias_name} " ]]; then
+                conflicts+=("$alias_name from $(basename "$file") (conflicts with existing)")
+              else
+                loaded_aliases+=("$alias_name")
+              fi
+            fi
+          done < "$file"
+
+          # Source the file to actually load the aliases
+          source "$file"
+          checkResult "$?"
+        fi
+      done
+    fi
+  }
+
+  # Load global aliases
+  load_from_dir "$ALIASES_DIR/global" "global"
+
+  # Load arch-specific aliases
+  case "${OS_TYPE}" in
+    linux)
+      # Load general linux aliases
+      load_from_dir "$ALIASES_DIR/arch" "arch"
+      # Load pi-specific aliases if on Raspberry Pi
+      isPi
+      if [[ "${IS_PI}" == true ]]; then
+        # Load pi.sh specifically if it exists
+        if [[ -f "$ALIASES_DIR/arch/pi.sh" ]]; then
+          printc "loading pi-specific aliases..." "lbl"
+          source "$ALIASES_DIR/arch/pi.sh"
+          checkResult "$?"
+        fi
+      fi
+      ;;
+    osx)
+      load_from_dir "$ALIASES_DIR/arch" "arch"
+      ;;
+    cygwin|mingw)
+      load_from_dir "$ALIASES_DIR/arch" "arch"
+      ;;
+  esac
+
+  # Load package-manager-specific aliases
+  if [[ "$PKMGR" != false ]]; then
+    load_from_dir "$ALIASES_DIR/package-manager" "package-manager"
+  fi
+
+  # Load user aliases
+  load_from_dir "$ALIASES_DIR/user" "user"
+
+  # Report conflicts
+  if [[ ${#conflicts[@]} -gt 0 ]]; then
+    printcLn "Warning: Alias conflicts detected:" "ye"
+    for conflict in "${conflicts[@]}"; do
+      printcLn "  - $conflict" "lyl"
+    done
+    echo
+  fi
+}

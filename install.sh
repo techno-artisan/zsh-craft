@@ -156,57 +156,16 @@ cat ./home/.functions.global >> "${FUNCTIONS_FILE}"
 checkResultLn "$?"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# combine and copy aliases
+# load aliases hierarchically
 detectOS
 
-# copy aliases
-ALIASES_FILE=~/.aliases
+printcLn "loading aliases hierarchically..." "lyl"
 
-printcLn "copying and combining aliases files..." "lyl"
+# Detect package manager for alias loading
+detectPackageManager
 
-# copy global
-printc "global..." "lbl"
-cp ./home/.aliases.global "${ALIASES_FILE}"
-checkResult "$?"
-
-# add OS type specific aliases
-printc "os type/package manager specific..." "lbl"
-case "${OS_TYPE}" in
-    linux )
-      # detect package manager
-      detectPackageManager
-
-      # add package manager specific aliases
-      if [ "$PKMGR" != false ]; then
-        cat ./home/package-manager-specific/.alias_"${PKMGR}" >> "${ALIASES_FILE}"
-        checkResult "$?"
-      else
-        printc "undefined package manager?!? {aborting}" "lre"
-        exit 255
-      fi
-
-      # (optional) add PI specific aliases
-      isPi
-      if [ "${IS_PI}" = true ]; then
-        printc "PI detected..." "lbl"
-        cat ./home/arch-specific/.aliases.pi >> "${ALIASES_FILE}"
-        checkResult "$?"
-      fi
-      ;;
-    osx )
-      # add OSX specific aliases
-      printc "OSX detected..." "lbl"
-      cat ./home/arch-specific/.aliases.osx >> "${ALIASES_FILE}"
-      checkResult "$?"
-      ADDITIONAL_PLUGINS+=( osx )
-      ;;
-    cygwin | mingw )
-      # add cygwin/mingw specific aliases
-      printc "cygwin/mingw detected..." "lbl"
-      cat ./home/arch-specific/.aliases.cygwin_mingw >> "${ALIASES_FILE}"
-      checkResult "$?"
-      ;;
-esac
+# Load aliases using the new modular system
+loadAliases
 
 echo
 

@@ -1,0 +1,26 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# User-defined aliases template
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# This file serves as a template for your personal aliases.
+# Copy this file to create your own alias groups in the user/ directory.
+#
+# Example structure:
+# - basic.sh          - Basic system aliases
+# - development.sh    - Development-related aliases
+# - productivity.sh   - Productivity tools
+# - custom.sh         - Your custom aliases
+#
+# To use:
+# 1. Create a new file in home/aliases/user/ (e.g., myaliases.sh)
+# 2. Add your aliases following the format: alias name='command'
+# 3. The installer will automatically load all .sh files from this directory
+#
+# Example aliases:
+# alias ll='ls -alF'
+# alias ..='cd ..'
+# alias grep='grep --color=auto'
+# alias update='sudo apt update && sudo apt upgrade'
+
+# Add your aliases below this line
+# alias example='echo "This is an example alias"'

@@ -35,7 +35,7 @@ Install flow (non-interactive mode):
 8. Copy `home/.zshrc` and `home/.p10k.zsh` to `~`
 9. Copy `include/.colors` → `~/.colors`
 10. Combine `include/.functions` + `home/.functions.global` → `~/.functions`
-11. Combine `home/.aliases.global` + OS/package-manager-specific alias files → `~/.aliases`
+11. Load aliases hierarchically from modular system (`home/aliases/`)
 12. Replace `##ADDITIONAL_PLUGINS##` placeholder in `~/.zshrc` with OS-specific plugins (e.g. `osx`) — or remove it if unused
 13. `exec zsh -l`
 
@@ -57,6 +57,8 @@ Proceeds in groups — each can be skipped independently:
 ```
 install.sh                          # installer entry point
 uninstall.sh                        # uninstaller entry point
+migrate-aliases.sh                  # migration script for old alias system
+cleanup-old-aliases.sh              # cleanup script for old alias files
 include/
   .version                          # ZSHCRAFT_VERSION variable (e.g. "1.1.0")
   .colors                           # ANSI escape code variables
@@ -64,13 +66,30 @@ include/
 home/
   .zshrc                            # base zsh config (theme, plugins, sources)
   .p10k.zsh                         # Powerlevel10k theme config
-  .aliases.global                   # global aliases (always copied)
+  .aliases.global                   # LEGACY: global aliases (deprecated)
+  .aliases.user.template            # template for user-defined aliases
   .functions.global                 # global functions appended to ~/.functions
-  arch-specific/
+  aliases/                          # NEW: modular alias system
+    global/                         # global aliases (basic, composer, docker, git, go)
+      basic.sh
+      composer.sh
+      docker.sh
+      docker-compose.sh
+      git.sh
+      go.sh
+    arch/                           # architecture-specific aliases
+      pi.sh
+    package-manager/                # package manager aliases
+      apt.sh
+      apk.sh
+      yum.sh
+      pacman.sh
+    user/                           # user-defined aliases (empty by default)
+  arch-specific/                    # LEGACY: old arch-specific aliases (deprecated)
     .aliases.osx                    # macOS aliases
     .aliases.pi                     # Raspberry Pi aliases
     .aliases.cygwin_mingw           # Cygwin/MinGW aliases
-  package-manager-specific/
+  package-manager-specific/         # LEGACY: old package-manager aliases (deprecated)
     .alias_apt / .alias_apk / .alias_yum / .alias_pacman
 assets/                             # screenshots for README
 ```
@@ -106,6 +125,19 @@ Short codes used throughout installer output:
 
 ## Alias/Config Files Copied to `~`
 
+**New Modular Alias System (v1.1.0+):**
+
+Aliases are now loaded hierarchically from modular group files:
+
+| Priority | Directory | Description | When |
+|----------|-----------|-------------|------|
+| 1 | `home/aliases/global/*.sh` | Global aliases (basic, composer, docker, git, go) | always |
+| 2 | `home/aliases/arch/*.sh` | Architecture-specific aliases (pi, osx, cygwin) | platform-dependent |
+| 3 | `home/aliases/package-manager/*.sh` | Package manager aliases (apt, apk, yum, pacman) | linux only |
+| 4 | `home/aliases/user/*.sh` | User-defined aliases | optional |
+
+**Legacy System (pre-v1.1.0):**
+
 | Source                                                       | Destination                | When                    |
 |--------------------------------------------------------------|----------------------------|-------------------------|
 | `home/.aliases.global`                                       | `~/.aliases` (base)        | always                  |
@@ -113,6 +145,7 @@ Short codes used throughout installer output:
 | `home/arch-specific/.aliases.pi`                             | appended to `~/.aliases`   | linux + Raspberry Pi    |
 | `home/arch-specific/.aliases.osx`                            | appended to `~/.aliases`   | macOS only              |
 | `home/arch-specific/.aliases.cygwin_mingw`                   | appended to `~/.aliases`   | Cygwin/MinGW only       |
+
 | `include/.functions`                                         | `~/.functions` (base)      | always                  |
 | `home/.functions.global`                                     | appended to `~/.functions` | always                  |
 | `include/.colors`                                            | `~/.colors`                | always                  |
