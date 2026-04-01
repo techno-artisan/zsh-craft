@@ -216,3 +216,56 @@ function implode() {
   shift;
   printf %s "$f" "${@/#/$d}";
 }
+
+# Install a git repository to a specified location
+# Usage: install_git_repo <repo_url> <target_path> <app_name>
+function install_git_repo() {
+  local repo_url="$1"
+  local target_path="$2"
+  local app_name="$3"
+
+  printcLn "installing '${app_name}'..." "wh"
+  git clone "$repo_url" "$target_path"
+  local result=$?
+  printc "installation of ${app_name} completed..." "wh"
+  checkResultLn "$result" || { printcLn "FAILED: ${app_name}" "lre"; exit 1; }
+}
+
+# Copy a config file with automatic backup if it exists
+# Usage: copy_config_file <source> <destination> <description>
+function copy_config_file() {
+  local source="$1"
+  local destination="$2"
+  local description="$3"
+
+  printc "...'${description}'..." "lyl"
+  # backup existing file if it exists
+  if [[ -f "$destination" ]]; then
+    cp "$destination" "${destination}.backup.$(date +%Y%m%d_%H%M%S)"
+    printc " (backed up existing)" "ye"
+  fi
+  cp "$source" "$destination"
+  checkResult "$?"
+}
+
+# Install a package using the appropriate package manager
+# Usage: install_package <package_name> <description>
+function install_package() {
+  local package="$1"
+  local description="$2"
+
+  printc "installing ${description}..." "lyl"
+  $SUDO_CMD apt install -y "$package"
+  checkResultLn "$?" || { printcLn "FAILED: package installation failed (check permissions or package manager)" "lre"; exit 1; }
+}
+
+# Install a gem package
+# Usage: install_gem <gem_name> <description>
+function install_gem() {
+  local gem="$1"
+  local description="$2"
+
+  printc "installing ${description}..." "lyl"
+  $SUDO_CMD gem install "$gem"
+  checkResultLn "$?" || { printcLn "FAILED: gem install $gem" "lre"; exit 1; }
+}

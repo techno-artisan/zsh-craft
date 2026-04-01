@@ -85,60 +85,33 @@ else
 fi
 
 printcLn "installing prerequisites..." "wh"
-printc "installing ruby-full and zsh via apt..." "lyl"
-$SUDO_CMD apt install -y ruby-full zsh
-checkResultLn "$?" || { printcLn "FAILED: package installation failed (check permissions or package manager)" "lre"; exit 1; }
-
-printc "installing colorls via gem..." "lyl"
-$SUDO_CMD gem install colorls
-checkResultLn "$?" || { printcLn "FAILED: gem install colorls" "lre"; exit 1; }
+install_package "ruby-full zsh" "ruby-full and zsh via apt"
+install_gem "colorls" "colorls via gem"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # install "Oh My Zsh!"
 # URL:    https://ohmyz.sh/
 # github: https://github.com/ohmyzsh/ohmyzsh/
-INSTALL_APP="Oh My ZSH!"
-printcLn "installing '${INSTALL_APP}'..." "wh"
+printcLn "installing 'Oh My ZSH!'..." "wh"
 RUNZSH=no sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 RESULT=$?
-printc "\ninstallation of ${INSTALL_APP} completed..." "wh"
-checkResultLn "${RESULT}" || { printcLn "FAILED: ${INSTALL_APP}" "lre"; exit 1; }
+printc "\ninstallation of Oh My ZSH! completed..." "wh"
+checkResultLn "${RESULT}" || { printcLn "FAILED: Oh My ZSH!" "lre"; exit 1; }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # install Powerlevel10k
 # github: https://github.com/romkatv/powerlevel10k
-INSTALL_APP="Powerlevel10k"
-printcLn "installing '${INSTALL_APP}'..." "wh"
-# shellcheck disable=SC2086
-git clone https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
-RESULT=$?
-printc "installation of ${INSTALL_APP} completed..." "wh"
-checkResultLn "${RESULT}" || { printcLn "FAILED: ${INSTALL_APP}" "lre"; exit 1; }
+install_git_repo "https://github.com/romkatv/powerlevel10k.git" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k" "Powerlevel10k"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # install smart plugins for omz
-INSTALL_APP="autosuggestions"
-printcLn "installing '${INSTALL_APP}'..." "wh"
-# shellcheck disable=SC2086
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-RESULT=$?
-printc "installation of ${INSTALL_APP} completed..." "wh"
-checkResultLn "${RESULT}" || { printcLn "FAILED: ${INSTALL_APP}" "lre"; exit 1; }
-
-INSTALL_APP="syntax-highlighting"
-printcLn "installing '${INSTALL_APP}'..." "wh"
-# shellcheck disable=SC2086
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-RESULT=$?
-printc "installation of ${INSTALL_APP} completed..." "wh"
-checkResultLn "${RESULT}" || { printcLn "FAILED: ${INSTALL_APP}" "lre"; exit 1; }
+install_git_repo "https://github.com/zsh-users/zsh-autosuggestions" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" "autosuggestions"
+install_git_repo "https://github.com/zsh-users/zsh-syntax-highlighting.git" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" "syntax-highlighting"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # copy pre-configured oh-my-zsh + Powerlevel10k config file
 printcLn "copying pre-configured config files..." "wh"
-printc "...'.zshrc'..." "lyl"
-cp ./home/.zshrc ~/.zshrc
-checkResult "$?"
+copy_config_file "./home/.zshrc" ~/.zshrc ".zshrc"
 echo
 printcLn "Powerlevel10k theme configuration:" "wh"
 printcLn "  [1] Use pre-configured theme (recommended)" "lgr"
@@ -151,9 +124,8 @@ while [[ "$P10K_CHOICE" != "1" && "$P10K_CHOICE" != "2" ]]; do
     P10K_CHOICE="${P10K_CHOICE:-1}"
 done
 if [[ "$P10K_CHOICE" == "1" ]]; then
-    printc "copying pre-configured '.p10k.zsh'..." "lyl"
-    cp ./home/.p10k.zsh ~/.p10k.zsh
-    checkResultLn "$?"
+    copy_config_file "./home/.p10k.zsh" ~/.p10k.zsh ".p10k.zsh"
+    echo
 else
     printcLn "skipping '.p10k.zsh' — Powerlevel10k will guide you through configuration on first start." "lyl"
 fi
@@ -166,9 +138,8 @@ COLORS_FILE=~/.colors
 
 printcLn "copying colors file..." "lyl"
 
-printc "main..." "lbl"
-cp ./include/.colors "${COLORS_FILE}"
-checkResultLn "$?"
+copy_config_file "./include/.colors" "${COLORS_FILE}" "colors"
+echo
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # combine and copy functions
