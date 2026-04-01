@@ -263,20 +263,35 @@ function install_package() {
     local mapped_package="$pkg"
     case "$PKMGR" in
       apk)
-        # APK uses similar names to APT
-        mapped_package="$pkg"
+        # APK: alpine linux package names
+        # build-essential -> alpine doesn't have it, use build-base instead
+        mapped_package="${pkg//build-essential/build-base}"
+        # ruby-full -> just ruby
+        mapped_package="${mapped_package//ruby-full/ruby}"
+        # ruby-dev -> ruby-dev (same)
+        mapped_package="$mapped_package"
         ;;
       yum)
-        # YUM: ruby-full -> ruby
-        mapped_package="${pkg//ruby-full/ruby}"
+        # YUM: RHEL/CentOS package names
+        # build-essential -> gcc, make, etc.
+        mapped_package="${pkg//build-essential/gcc make}"
+        # ruby-full -> ruby
+        mapped_package="${mapped_package//ruby-full/ruby}"
+        # ruby-dev -> ruby-devel
+        mapped_package="${mapped_package//ruby-dev/ruby-devel}"
         ;;
       apt)
-        # APT: keep as is
+        # APT: Debian/Ubuntu package names (keep as is)
         mapped_package="$pkg"
         ;;
       pacman)
-        # Pacman: ruby-full -> ruby
-        mapped_package="${pkg//ruby-full/ruby}"
+        # Pacman: Arch Linux package names
+        # build-essential -> base-devel
+        mapped_package="${pkg//build-essential/base-devel}"
+        # ruby-full -> ruby
+        mapped_package="${mapped_package//ruby-full/ruby}"
+        # ruby-dev -> ruby (development headers are included)
+        mapped_package="${mapped_package//ruby-dev/ruby}"
         ;;
       *)
         printcLn "ERROR: Unsupported package manager: $PKMGR" "lre"
@@ -289,14 +304,14 @@ function install_package() {
         $SUDO_CMD apk add "$mapped_package"
         ;;
       yum)
-        $SUDO_CMD yum install -y "$mapped_package"
+        $SUDO_CMD yum install -y $mapped_package
         ;;
       apt)
         $SUDO_CMD apt update >/dev/null 2>&1
         $SUDO_CMD apt install -y "$mapped_package"
         ;;
       pacman)
-        $SUDO_CMD pacman -S --noconfirm "$mapped_package"
+        $SUDO_CMD pacman -S --noconfirm $mapped_package
         ;;
     esac
     checkResultLn "$?" || { printcLn "FAILED: package installation failed for '$mapped_package' (check permissions or package manager)" "lre"; exit 1; }

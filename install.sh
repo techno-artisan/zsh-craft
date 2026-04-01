@@ -88,7 +88,8 @@ fi
 detectPackageManager
 
 printcLn "installing prerequisites..." "wh"
-install_package "ruby-full zsh" "ruby-full and zsh via $PKMGR"
+# Install build tools and ruby development headers (required for native extensions)
+install_package "build-essential ruby-dev ruby-full zsh" "build-essential, ruby-dev, ruby-full and zsh via $PKMGR"
 install_gem "colorls" "colorls via gem"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
