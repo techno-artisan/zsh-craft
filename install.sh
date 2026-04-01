@@ -11,6 +11,48 @@ source ./include/.functions
 # shellcheck disable=SC2034
 MIN_BASH_VERSION="4"
 
+# parse command line arguments
+DRY_RUN=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --help|-h)
+            echo "zshcraft - The smart zsh installer [${ZSHCRAFT_VERSION}]"
+            echo ""
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --help, -h          Show this help message"
+            echo "  --dry-run           Show what would be done without making changes"
+            echo ""
+            echo "Requirements:"
+            echo "  - bash >= ${MIN_BASH_VERSION}"
+            echo "  - curl, git"
+            echo "  - sudo access (unless running as root)"
+            echo "  - internet connection"
+            echo ""
+            echo "Supported platforms:"
+            echo "  - Linux (Debian/Ubuntu-based with apt)"
+            echo "  - macOS (manual prerequisite installation)"
+            echo "  - Windows (Cygwin/MinGW)"
+            exit 0
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+if [[ "$DRY_RUN" == true ]]; then
+    echo "DRY RUN MODE - No changes will be made"
+    echo ""
+fi
+
 clear
 
 printcLn "zshcraft - The smart zsh installer [${ZSHCRAFT_VERSION}]" "wh"
@@ -18,19 +60,37 @@ echo
 
 ensureValidBashVersion
 
+# check for required tools
+printcLn "checking for required tools..." "yl"
+for tool in curl git; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        printcLn "ERROR: $tool is required but not found. Please install it first." "lre"
+        exit 1
+    fi
+done
+printcLn "all required tools found" "gr"
+
 printcLn "ensure user has 'sudo' rights..." "yl"
-if ! sudo -v 2>/dev/null; then
+if [[ $EUID -ne 0 ]] && ! sudo -v 2>/dev/null; then
     printcLn "ERROR: sudo access required. Ask an admin to add you to sudoers first." "lre";
     exit 1
 fi
 
-printcLn "installing prerequisites (at least sudo required)..." "wh"
+# Set SUDO_CMD based on whether we're running as root
+if [[ $EUID -eq 0 ]]; then
+    SUDO_CMD=""
+    printcLn "running as root - elevated privileges available" "gr"
+else
+    SUDO_CMD="sudo"
+fi
+
+printcLn "installing prerequisites..." "wh"
 printc "installing ruby-full and zsh via apt..." "lyl"
-sudo apt install -y ruby-full zsh
-checkResultLn "$?" || { printcLn "FAILED: no sudo access or apt unavailable" "lre"; exit 1; }
+$SUDO_CMD apt install -y ruby-full zsh
+checkResultLn "$?" || { printcLn "FAILED: package installation failed (check permissions or package manager)" "lre"; exit 1; }
 
 printc "installing colorls via gem..." "lyl"
-sudo gem install colorls
+$SUDO_CMD gem install colorls
 checkResultLn "$?" || { printcLn "FAILED: gem install colorls" "lre"; exit 1; }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

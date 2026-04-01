@@ -15,11 +15,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### `install.sh` — Installer
 
-Non-interactive. Sources `include/.version`, `include/.colors`, `include/.functions` at the top.
+**Default mode: Non-interactive.** Sources `include/.version`, `include/.colors`, `include/.functions` at the top. Can be run with `--interactive` flag for user-guided configuration choices.
 
-**Requirements:** bash >= 4, `curl`, `git`, `sudo` access, internet connection.
+**Requirements:** bash >= 4, `curl`, `git`, `sudo` access (unless running as root), internet connection.
 
-Install flow:
+**Command line options:**
+- `--help`, `-h`: Show usage information
+- `--dry-run`: Preview installation without making changes
+- `--interactive`: Enable interactive mode for configuration choices
+
+Install flow (non-interactive mode):
 1. Print banner with `$ZSHCRAFT_VERSION`
 2. Validate bash version (`ensureValidBashVersion`)
 3. Check sudo access — abort if not available
