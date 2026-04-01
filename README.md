@@ -81,9 +81,9 @@ p10k configure
 
 | Platform | Package managers                        | Notes                                         |
 |----------|-----------------------------------------|-----------------------------------------------|
-| Linux    | APT, YUM, APK, Pacman                   | Tested on Debian/Ubuntu, Alpine, Arch, CentOS |
-| macOS    | — (Homebrew aliases via `.aliases.osx`) |                                               |
-| Windows  | Cygwin / MinGW                          |                                               |
+| Linux    | APT, YUM, APK, Pacman                   | ✅ Debian/Ubuntu (APT)<br>✅ Alpine (APK)<br>✅ Fedora (YUM)<br>⚠️ Arch (Pacman) — untested |
+| macOS    | — (Homebrew aliases via `.aliases.osx`) | ❌ untested                                   |
+| Windows  | Cygwin / MinGW                          | ❌ untested                                   |
 
 > **Note:** Prerequisite installation (`zsh`, `ruby`/`ruby-full`, `colorls` via package manager/`gem`) works automatically on Linux systems with supported package managers. On other platforms, install these manually before running the installer.
 
