@@ -31,6 +31,8 @@ Alias and function sets are assembled automatically based on the detected OS and
 
 **Requirements:** bash >= 4, `curl`, `git`, `sudo` access, internet connection
 
+**On Windows:** This installer is designed for Linux/macOS and can run on Windows only via **WSL 2** (Windows Subsystem for Linux 2). Ensure WSL 2 with a Linux distribution (e.g., Ubuntu, Alpine, Debian) is installed and bash is available.
+
 > **Note:** Powerlevel10k and colorls use icons that require a **[Nerd Font](https://www.nerdfonts.com/)** in your terminal emulator. Without it, icons will appear as `?` or broken characters. Recommended: [MesloLGS NF](https://github.com/romkatv/powerlevel10k#fonts) (used by Powerlevel10k by default).
 
 ```bash
@@ -44,8 +46,8 @@ The installer ends by exec'ing into `zsh` — your new shell is ready immediatel
 The installer is non-interactive and runs fully automated:
 
 - Verifies bash >= 4 and that `sudo` access is available — aborts early if not
-- Installs `ruby-full` and `zsh` via `apt`
-- Installs `colorls` via `gem` (requires ruby-full)
+- Detects package manager and installs prerequisites: `ruby`/`ruby-full`, `zsh` (package names adapted per package manager)
+- Installs `colorls` via `gem` (requires ruby)
 - Installs **Oh My ZSH!** in unattended mode (`RUNZSH=no`) — does not auto-launch a new shell
 - Clones **Powerlevel10k** into `~/.oh-my-zsh/custom/themes/`
 - Clones **zsh-autosuggestions** and **zsh-syntax-highlighting** into `~/.oh-my-zsh/custom/plugins/`
@@ -77,13 +79,13 @@ p10k configure
 
 ### Supported platforms ###
 
-| Platform | Package managers                        | Notes                              |
-|----------|-----------------------------------------|------------------------------------|
-| Linux    | APT, YUM, APK, Pacman                   | Tested on Debian/Ubuntu            |
-| macOS    | — (Homebrew aliases via `.aliases.osx`) |                                    |
-| Windows  | Cygwin / MinGW                          |                                    |
+| Platform | Package managers                        | Notes                                         |
+|----------|-----------------------------------------|-----------------------------------------------|
+| Linux    | APT, YUM, APK, Pacman                   | Tested on Debian/Ubuntu, Alpine, Arch, CentOS |
+| macOS    | — (Homebrew aliases via `.aliases.osx`) |                                               |
+| Windows  | Cygwin / MinGW                          |                                               |
 
-> **Note:** The prerequisite installation (`zsh`, `ruby-full`, `colorls`) uses `apt` and `gem` and is currently only supported on Debian/Ubuntu-based systems. On other platforms, install these manually before running the installer.
+> **Note:** Prerequisite installation (`zsh`, `ruby`/`ruby-full`, `colorls` via package manager/`gem`) works automatically on Linux systems with supported package managers. On other platforms, install these manually before running the installer.
 
 ### Contribution guidelines ###
 

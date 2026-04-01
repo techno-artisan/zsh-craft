@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
             echo "  - internet connection"
             echo ""
             echo "Supported platforms:"
-            echo "  - Linux (Debian/Ubuntu-based with apt)"
+            echo "  - Linux (Debian/Ubuntu with apt, Alpine with apk, Arch with pacman, CentOS/RHEL with yum)"
             echo "  - macOS (manual prerequisite installation)"
             echo "  - Windows (Cygwin/MinGW)"
             exit 0
@@ -84,8 +84,11 @@ else
     SUDO_CMD="sudo"
 fi
 
+# Detect package manager for prerequisite installation
+detectPackageManager
+
 printcLn "installing prerequisites..." "wh"
-install_package "ruby-full zsh" "ruby-full and zsh via apt"
+install_package "ruby-full zsh" "ruby-full and zsh via $PKMGR"
 install_gem "colorls" "colorls via gem"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

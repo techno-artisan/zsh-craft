@@ -17,6 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Default mode: Non-interactive.** Sources `include/.version`, `include/.colors`, `include/.functions` at the top. Can be run with `--interactive` flag for user-guided configuration choices.
 
+**Platform Support:** This installer is designed for Linux and macOS. On Windows, it requires **WSL 2** (Windows Subsystem for Linux 2) with a Linux distribution installed.
+
 **Requirements:** bash >= 4, `curl`, `git`, `sudo` access (unless running as root), internet connection.
 
 **Command line options:**
@@ -28,7 +30,7 @@ Install flow (non-interactive mode):
 1. Print banner with `$ZSHCRAFT_VERSION`
 2. Validate bash version (`ensureValidBashVersion`)
 3. Check sudo access — abort if not available
-4. Install prerequisites via apt: `ruby-full`, `zsh`
+4. Detect package manager and install prerequisites: `ruby`/`ruby-full`, `zsh` (package names adapted per package manager)
 5. Install `colorls` via `sudo gem install colorls`
 6. Install Oh My ZSH (unattended, `RUNZSH=no`)
 7. Clone Powerlevel10k, zsh-autosuggestions, zsh-syntax-highlighting into `~/.oh-my-zsh/custom/`
@@ -162,8 +164,8 @@ Aliases are now loaded hierarchically from modular group files:
 
 | Platform | Package managers           | Notes                                    |
 |----------|----------------------------|------------------------------------------|
-| Linux    | APT, YUM, APK, Pacman      | Tested on Debian/Ubuntu                  |
+| Linux    | APT, YUM, APK, Pacman      | Tested on Debian/Ubuntu, Alpine, Arch, CentOS |
 | macOS    | — (manual prereqs)         | `osx` plugin injection currently broken  |
 | Windows  | Cygwin / MinGW             | Manual prereq installation required      |
 
-> Prerequisite installation (`zsh`, `ruby-full`, `colorls` via `apt`/`gem`) only works on Debian/Ubuntu-based systems. On other platforms, install these manually before running.
+> Prerequisite installation (`zsh`, `ruby`/`ruby-full`, `colorls` via package manager/`gem`) works automatically on Linux systems with supported package managers. On other platforms, install these manually before running.
